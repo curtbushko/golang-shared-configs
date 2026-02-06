@@ -14,6 +14,7 @@
       configFiles = {
         golangci = ".golangci.yml";
         goArchLint = ".go-arch-lint.yml";
+        goAiLint = ".go-ai-lint.yml";
       };
     in
     {
@@ -28,6 +29,7 @@
           configMap = {
             golangci = { src = "${self}/.golangci.yml"; dst = ".golangci.yml"; };
             goArchLint = { src = "${self}/.go-arch-lint.yml"; dst = ".go-arch-lint.yml"; };
+            goAiLint = { src = "${self}/.go-ai-lint.yml"; dst = ".go-ai-lint.yml"; };
           };
         in builtins.concatStringsSep "\n" (
           map (name:
@@ -48,10 +50,16 @@
           cp ${self}/.go-arch-lint.yml $out/.go-arch-lint.yml
         '';
 
+        go-ai-lint-config = pkgs.runCommand "go-ai-lint-config" {} ''
+          mkdir -p $out
+          cp ${self}/.go-ai-lint.yml $out/.go-ai-lint.yml
+        '';
+
         all-configs = pkgs.runCommand "golang-shared-configs" {} ''
           mkdir -p $out
           cp ${self}/.golangci.yml $out/
           cp ${self}/.go-arch-lint.yml $out/
+          cp ${self}/.go-ai-lint.yml $out/
         '';
 
         default = self.packages.${pkgs.system}.all-configs;

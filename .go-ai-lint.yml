@@ -1,0 +1,47 @@
+# go-ai-lint configuration
+# https://github.com/curtbushko/go-ai-lint
+
+version: 1
+
+# Paths to check
+include:
+  - "./..."
+
+# Paths to exclude
+exclude:
+  - "**/testdata/**"
+  - "**/*_test.go"
+  - "**/mock_*.go"
+  - "vendor/**"
+
+# Linting rules
+rules:
+  # Error handling
+  error-handling:
+    enabled: true
+    severity: error
+
+  # Nil safety
+  nil-safety:
+    enabled: true
+    severity: error
+
+  # Resource management
+  resource-leaks:
+    enabled: true
+    severity: error
+
+  # Concurrency
+  concurrency:
+    enabled: true
+    severity: warning
+
+  # Context usage
+  context-usage:
+    enabled: true
+    severity: warning
+
+  # Code quality
+  code-quality:
+    enabled: true
+    severity: warning
