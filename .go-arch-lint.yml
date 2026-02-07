@@ -6,11 +6,13 @@
 # Graph:   go-arch-lint graph
 
 version: 3
-workdir: internal
 
 # Allow all vendor imports (we only enforce component boundaries)
 allow:
   depOnAnyVendor: true
+  # Disable deep scan since cmd is the composition root and wires all components.
+  # Deep scan incorrectly reports cross-layer deps when cmd does the wiring.
+  deepScan: false
 
 # Define architectural components
 # Hexagonal Architecture Layers (inside-out):
@@ -18,50 +20,48 @@ allow:
 #   2. Ports - interfaces defining boundaries
 #   3. Application - use cases/services orchestrating domain logic
 #   4. Adapters (outermost) - infrastructure implementations
+#   5. Pkg - public reusable packages (utilities, libraries)
 components:
   # INNER LAYER: Domain (pure business logic)
   # Contains: entities, value objects, domain services, domain errors
   domain:
-    in: domain/**
+    in: internal/domain/**
 
   # INNER LAYER: Ports (interfaces)
   # Contains: repository interfaces, service interfaces, DTOs
   ports:
-    in: ports/**
+    in: internal/ports/**
 
   # APPLICATION LAYER: Use Cases/Services
   # Contains: application services that orchestrate domain logic
-  # Add your use cases here, e.g.:
-  #   usecase_name:
-  #     in: application/usecase_name/**
   application:
-    in: application/**
+    in: internal/application/**
 
   # OUTER LAYER: Adapters (Infrastructure)
   # Contains: implementations of ports (repositories, clients, etc.)
-  # Add your adapters here, e.g.:
-  #   database:
-  #     in: adapters/database/**
-  #   http:
-  #     in: adapters/http/**
-  #   grpc:
-  #     in: adapters/grpc/**
   adapters:
-    in: adapters/**
+    in: internal/adapters/**
 
   # Supporting: Configuration
   config:
-    in: config/**
+    in: internal/config/**
 
-  # Integration tests (separate component)
-  integration:
-    in: integration/**
+  # COMPOSITION ROOT: Wires all dependencies together
+  # Contains: main.go, dependency injection
+  cmd:
+    in: cmd/**
+
+  # PUBLIC PACKAGES: Reusable library code
+  # Contains: utility packages, shared libraries
+  pkg:
+    in: pkg/**
 
 # Components that can be used by all other components
-# Domain and ports are the core - everything can depend on them
+# Domain, ports, and pkg are foundational - everything can depend on them
 commonComponents:
   - domain
   - ports
+  - pkg
 
 # Dependency rules - enforces hexagonal architecture constraints
 # Key principle: dependencies point INWARD (adapters -> application -> ports -> domain)
@@ -91,9 +91,14 @@ deps:
   config:
     anyVendorDeps: true
 
-  # Integration tests can use everything
-  integration:
+  # Cmd is the composition root - can depend on everything
+  cmd:
     anyProjectDeps: true
+    anyVendorDeps: true
+
+  # Pkg is standalone - can depend on vendor libs but not internal components
+  pkg:
+    anyVendorDeps: true
 
 # Exclude test files from analysis
 excludeFiles:
