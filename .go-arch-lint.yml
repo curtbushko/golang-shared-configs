@@ -106,3 +106,4 @@ excludeFiles:
   - mock_.*\.go$
   - /mocks/
   - /testdata/
+  - /features/
