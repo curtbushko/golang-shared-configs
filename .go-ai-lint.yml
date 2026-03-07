@@ -1,47 +1,36 @@
-# go-ai-lint configuration
-# https://github.com/curtbushko/go-ai-lint
+# Example go-ai-lint configuration
+# Copy to .go-ai-lint.yml to use
+#
+# Config file search order:
+# 1. Explicit path via --config flag
+# 2. .go-ai-lint.yml in current directory
+# 3. .go-ai-lint.yml in parent directories (up to root)
+# 4. Built-in defaults
 
 version: 1
 
-# Paths to check
-include:
-  - "./..."
+run:
+  timeout: 5m
+  concurrency: 0  # auto (uses CPU count)
+  skip-dirs: []
+  skip-files: []
 
-# Paths to exclude
-exclude:
-  - "**/testdata/**"
-  - "**/*_test.go"
-  - "**/mock_*.go"
-  - "vendor/**"
+output:
+  format: text  # text, json, ai, sarif
+  print-analyzer-name: true
+  sort-by: file
 
-# Linting rules
-rules:
-  # Error handling
-  error-handling:
-    enabled: true
-    severity: error
+nolint:
+  enabled: true
+  require-specific: false
 
-  # Nil safety
-  nil-safety:
-    enabled: true
-    severity: error
+analyzers:
+  enable-all: true
+  # Uncomment to disable specific analyzers:
+  # disable:
+  #   - deferlint
+  #   - errorlint
 
-  # Resource management
-  resource-leaks:
-    enabled: true
-    severity: error
-
-  # Concurrency
-  concurrency:
-    enabled: true
-    severity: warning
-
-  # Context usage
-  context-usage:
-    enabled: true
-    severity: warning
-
-  # Code quality
-  code-quality:
-    enabled: true
-    severity: warning
+severity:
+  min-severity: low  # low, medium, high, critical
+  error-on: []       # e.g., [high, critical] to fail CI on these
