@@ -77,6 +77,9 @@ linters:
     - ireturn           # Interface returns not always practical
 
   settings:
+    interfacebloat:
+      max: 10
+
     revive:
       rules:
         # Naming conventions aligned with Effective Go
