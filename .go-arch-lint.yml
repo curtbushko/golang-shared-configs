@@ -56,12 +56,17 @@ components:
   pkg:
     in: pkg/**
 
+  # GENERATED CODE: Protobuf/gRPC generated files
+  gen:
+    in: gen/**
+
 # Components that can be used by all other components
-# Domain, ports, and pkg are foundational - everything can depend on them
+# Domain, ports, pkg, and gen are foundational - everything can depend on them
 commonComponents:
   - domain
   - ports
   - pkg
+  - gen
 
 # Dependency rules - enforces hexagonal architecture constraints
 # Key principle: dependencies point INWARD (adapters -> application -> ports -> domain)
@@ -100,6 +105,10 @@ deps:
   pkg:
     anyVendorDeps: true
 
+  # Gen is generated code - can depend on vendor libs (protobuf, grpc)
+  gen:
+    anyVendorDeps: true
+
 # Exclude test files from analysis
 excludeFiles:
   - _test\.go$
@@ -107,3 +116,5 @@ excludeFiles:
   - /mocks/
   - /testdata/
   - /features/
+  - /\.trash/
+  - /tools/
