@@ -94,6 +94,7 @@ excludeFiles:
   - /features/
   - /\.trash/
   - /tools/
+  - /main\.go$
 
 # =============================================================================
 # OPTIONAL COMPONENTS - Uncomment if your project uses these directories
