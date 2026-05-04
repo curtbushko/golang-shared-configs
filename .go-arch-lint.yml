@@ -20,7 +20,8 @@ allow:
 #   2. Ports - interfaces defining boundaries
 #   3. Application - use cases/services orchestrating domain logic
 #   4. Adapters (outermost) - infrastructure implementations
-#   5. Pkg - public reusable packages (utilities, libraries)
+#   5. Cmd - composition root (main.go, dependency injection)
+# See bottom of file for optional components (config, pkg, gen)
 components:
   # INNER LAYER: Domain (pure business logic)
   # Contains: entities, value objects, domain services, domain errors
@@ -42,31 +43,16 @@ components:
   adapters:
     in: internal/adapters/**
 
-  # Supporting: Configuration
-  config:
-    in: internal/config/**
-
   # COMPOSITION ROOT: Wires all dependencies together
   # Contains: main.go, dependency injection
   cmd:
     in: cmd/**
 
-  # PUBLIC PACKAGES: Reusable library code
-  # Contains: utility packages, shared libraries
-  pkg:
-    in: pkg/**
-
-  # GENERATED CODE: Protobuf/gRPC generated files
-  gen:
-    in: gen/**
-
 # Components that can be used by all other components
-# Domain, ports, pkg, and gen are foundational - everything can depend on them
+# Domain and ports are foundational - everything can depend on them
 commonComponents:
   - domain
   - ports
-  - pkg
-  - gen
 
 # Dependency rules - enforces hexagonal architecture constraints
 # Key principle: dependencies point INWARD (adapters -> application -> ports -> domain)
@@ -92,21 +78,9 @@ deps:
     mayDependOn:
       - ports
 
-  # Config is standalone infrastructure concern
-  config:
-    anyVendorDeps: true
-
   # Cmd is the composition root - can depend on everything
   cmd:
     anyProjectDeps: true
-    anyVendorDeps: true
-
-  # Pkg is standalone - can depend on vendor libs but not internal components
-  pkg:
-    anyVendorDeps: true
-
-  # Gen is generated code - can depend on vendor libs (protobuf, grpc)
-  gen:
     anyVendorDeps: true
 
 # Exclude test files from analysis
@@ -118,3 +92,38 @@ excludeFiles:
   - /features/
   - /\.trash/
   - /tools/
+
+# =============================================================================
+# OPTIONAL COMPONENTS - Uncomment if your project uses these directories
+# =============================================================================
+#
+# To enable, add the component under 'components:', add to 'commonComponents:'
+# if needed, and add dependency rules under 'deps:'.
+#
+# --- Config (internal/config/**) ---
+# components:
+#   config:
+#     in: internal/config/**
+# deps:
+#   config:
+#     anyVendorDeps: true
+#
+# --- Pkg (pkg/**) - public reusable packages ---
+# components:
+#   pkg:
+#     in: pkg/**
+# commonComponents:
+#   - pkg
+# deps:
+#   pkg:
+#     anyVendorDeps: true
+#
+# --- Gen (gen/**) - protobuf/gRPC generated code ---
+# components:
+#   gen:
+#     in: gen/**
+# commonComponents:
+#   - gen
+# deps:
+#   gen:
+#     anyVendorDeps: true
