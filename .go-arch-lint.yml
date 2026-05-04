@@ -46,9 +46,7 @@ components:
   # COMPOSITION ROOT: Wires all dependencies together
   # Contains: main.go, dependency injection
   cmd:
-    in:
-      - cmd/**
-      - main.go
+    in: cmd/**
 
 # Components that can be used by all other components
 # Domain and ports are foundational - everything can depend on them
