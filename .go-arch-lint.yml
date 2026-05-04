@@ -93,7 +93,9 @@ excludeFiles:
   - /\.trash/
   - /tools/
   - /main\.go$
-  - /examples/ 
+  - /examples/
+  - /pkg/
+  - /internal/config/
 
 # =============================================================================
 # OPTIONAL COMPONENTS - Uncomment if your project uses these directories
